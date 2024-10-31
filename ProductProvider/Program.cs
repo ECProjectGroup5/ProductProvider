@@ -1,13 +1,17 @@
+using Infrastructure.Data;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
-    .ConfigureServices(services =>
+    .ConfigureServices((context, services) =>
     {
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
+        services.AddDbContext<DataContext>(x => x.UseSqlServer("Server=tcp:rikaproductdbserver.database.windows.net,1433;Initial Catalog=rikaproductdb;Persist Security Info=False;User ID=rikaproductadmin;Password=Bytmig123!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
     })
     .Build();
 
