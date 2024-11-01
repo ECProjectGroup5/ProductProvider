@@ -8,14 +8,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var host = new HostBuilder()
+     .ConfigureAppConfiguration((context, config) =>
+     {
+         config.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+         config.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", optional: true, reloadOnChange: true);
+         config.AddEnvironmentVariables();
+     })
+
     .ConfigureFunctionsWebApplication()
     .ConfigureServices((context, services) =>
     {
+        var connectionString = context.Configuration.GetConnectionString("Database");
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
-        services.AddDbContext<DataContext>(x => x.UseSqlServer("Server=tcp:rikaproductdbserver.database.windows.net,1433;Initial Catalog=rikaproductdb;Persist Security Info=False;User ID=rikaproductadmin;Password=Bytmig123!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+        services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
         services.AddScoped<ProductService>();
         services.AddScoped<Repo>();
+        
+
     })
     .Build();
 
