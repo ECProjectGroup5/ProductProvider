@@ -1,4 +1,6 @@
 using Infrastructure.Data;
+using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +14,8 @@ var host = new HostBuilder()
         services.AddApplicationInsightsTelemetryWorkerService();
         services.ConfigureFunctionsApplicationInsights();
         services.AddDbContext<DataContext>(x => x.UseSqlServer("Server=tcp:rikaproductdbserver.database.windows.net,1433;Initial Catalog=rikaproductdb;Persist Security Info=False;User ID=rikaproductadmin;Password=Bytmig123!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"));
+        services.AddScoped<ProductService>();
+        services.AddScoped<Repo>();
     })
     .Build();
 
