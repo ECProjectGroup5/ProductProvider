@@ -80,7 +80,7 @@ public class Repo(DataContext context, ILogger<Repo> logger)
                 return ResponseFactory.NotFound();
             }
 
-            return ResponseFactory.Ok(exists);
+            return ResponseFactory.Exists(exists);
         }
         catch (Exception ex)
         {
