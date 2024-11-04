@@ -1,6 +1,7 @@
 ﻿using Infrastructure.Data;
 using Infrastructure.Entities;
 using Infrastructure.Factories;
+using Infrastructure.Interfaces;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories;
 
-public class Repo(DataContext context, ILogger<Repo> logger)
+public class Repo(DataContext context, ILogger<Repo> logger) : IRepo
 {
     private readonly DataContext _context = context;
     private readonly ILogger<Repo> _logger = logger;

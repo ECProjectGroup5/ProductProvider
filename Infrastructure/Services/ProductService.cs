@@ -1,14 +1,15 @@
 ﻿using Infrastructure.Entities;
 using Infrastructure.Factories;
+using Infrastructure.Interfaces;
 using Infrastructure.Models;
 using Infrastructure.Repositories;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
 
-public class ProductService(Repo repo, ILogger<ProductService> logger)
+public class ProductService(IRepo repo, ILogger<ProductService> logger)
 {
-    private readonly Repo repo = repo;
+    private readonly IRepo repo = repo;
     private readonly ILogger<ProductService> _logger = logger;
 
     public async Task<ResponseResult> CreateAsync(ProductModel product)
