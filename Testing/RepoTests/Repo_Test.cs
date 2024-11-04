@@ -1,6 +1,4 @@
-﻿
-
-using Infrastructure.Data;
+﻿using Infrastructure.Data;
 using Infrastructure.Entities;
 using Infrastructure.Factories;
 using Infrastructure.Models;
@@ -21,20 +19,20 @@ namespace Infrastructure.Tests.Repositories
 
         public RepoTests()
         {
-            // Set up InMemory database
+           
             var options = new DbContextOptionsBuilder<DataContext>()
                 .UseInMemoryDatabase(databaseName: "TestDatabase")
                 .Options;
 
             _context = new DataContext(options);
 
-            // Mock ILogger
+            
             _loggerMock = new Mock<ILogger<Repo>>();
 
-            // Create instance of Repo with InMemory database and Mock logger
             _repo = new Repo(_context, _loggerMock.Object);
         }
 
+        //Test för att kontroller att en produkt skapas korrekt samt att statusmeddelande 200 OK returneras
         [Fact]
         public async Task CreateAsync_ShouldAddProduct()
         {
@@ -49,6 +47,7 @@ namespace Infrastructure.Tests.Repositories
             Assert.Contains(_context.Products, p => p.Title == "Test Product");
         }
 
+        // Test för att kontrollera att en exsisterande produkt returneras när sökning efter den görs, samt att statusmeddelande 200 OK skickas med 
         [Fact]
         public async Task GetOneAsync_ShouldReturnProduct_WhenProductExists()
         {
@@ -66,6 +65,7 @@ namespace Infrastructure.Tests.Repositories
             Assert.Equal("Test Product", ((ProductEntity)result.ContentResult!).Title);
         }
 
+        //Test för att kontrollera att en icke exsisterande produkt inte returneras när sökning efter den görs, samt att statusmeddelande 404 NotFound skickas med
         [Fact]
         public async Task GetOneAsync_ShouldReturnNotFound_WhenProductDoesNotExist()
         {
@@ -76,6 +76,7 @@ namespace Infrastructure.Tests.Repositories
             Assert.Equal(StatusCode.NOT_FOUND, result.StatusCode);
         }
 
+        // test för att kontrollera att en lista av samtliga produkter returneras genom GetAllAsync samt att statusmeddelande 200 Ok medföljer
         [Fact]
         public async Task GetAllAsync_ShouldReturnAllProducts()
         {
@@ -93,6 +94,7 @@ namespace Infrastructure.Tests.Repositories
             Assert.True(((IEnumerable<ProductEntity>)result.ContentResult!).Any());
         }
 
+        //test för att kontrollera att det returneras ett bool värde(TRUE) om en produkt existerar 
         [Fact]
         public async Task ExistsAsync_ShouldReturnTrue_WhenProductExists()
         {
@@ -109,6 +111,8 @@ namespace Infrastructure.Tests.Repositories
             Assert.True((bool)result.ContentResult!);
         }
 
+
+        //test för att kontrollera att statusmeddelande 404 NotFound returneras ifall en proukt som söks efter inte exsisterar 
         [Fact]
         public async Task ExistsAsync_ShouldReturnNotFound_WhenProductDoesNotExist()
         {
@@ -117,7 +121,10 @@ namespace Infrastructure.Tests.Repositories
 
             // Assert
             Assert.Equal(StatusCode.NOT_FOUND, result.StatusCode);
+           
         }
+
+        //test för att kontorllera att en produkt som ska uppdateras gör så korrekt samt att nya uppgifter sparas och sedan ska skatusmeddelande 200 Ok
 
         [Fact]
         public async Task UpdateAsync_ShouldUpdateProduct_WhenProductExists()
@@ -140,6 +147,7 @@ namespace Infrastructure.Tests.Repositories
             Assert.Equal("New Title", entityResult.Title);
         }
 
+        // test för att kontrollera att statusmeddelande 404 NOtFound returneras om man försöker updatera produkt som inte exstiterar 
         [Fact]
         public async Task UpdateAsync_ShouldReturnNotFound_WhenProductDoesNotExist()
         {
@@ -154,6 +162,7 @@ namespace Infrastructure.Tests.Repositories
             Assert.Equal(StatusCode.NOT_FOUND, result.StatusCode);
         }
 
+        // test för att kontrollera att en exsisterande produkt som man försöker ta bort raderas korrekt från databasen om den hittas
         [Fact]
         public async Task DeleteAsync_ShouldRemoveProduct_WhenProductExists()
         {
@@ -170,6 +179,8 @@ namespace Infrastructure.Tests.Repositories
             Assert.DoesNotContain(_context.Products, p => p.Title == "Product to Delete");
         }
 
+
+        //Kontrollerar att statusmeddelande 404 NotFound om man förslker ta bort en produkt som inte exsisterar i databasen 
         [Fact]
         public async Task DeleteAsync_ShouldReturnNotFound_WhenProductDoesNotExist()
         {
