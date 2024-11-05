@@ -8,38 +8,31 @@ using Microsoft.Extensions.Logging;
 namespace Infrastructure.Services;
 
 // Den här klassen hanterar tjänstelogiken för att arbeta med produkter
-public class ProductService(IRepo repo, ILogger<ProductService> logger)
+public class ProductService(IRepo repo, ILogger<ProductService> logger , ProductFactory productFactory)
 {
     // Fält för att hålla referenser till repo och logger
     private readonly IRepo repo = repo;
     private readonly ILogger<ProductService> _logger = logger;
+    private readonly ProductFactory _productFactory = productFactory;
 
     // Skapar en ny produkt baserat på den data som skickas in
-    public async Task<ResponseResult> CreateAsync(ProductModel product)
+    public async Task<ResponseResult> CreateAsync(string body)
     {
         try
         {
-            // Skapar en ny ProductEntity från den mottagna ProductModel
-            var entity = new ProductEntity
-            {
-                Title = product.Title,
-                Ingress = product.Ingress,
-                Description = product.Description,
-                Price = product.Price,
-                DiscountPrice = product.DiscountPrice,
-                Manufacturer = product.Manufacturer,
-                PrimaryImage = product.PrimaryImage
-            };
-            
-            // Använder repo för att skapa produkten i databasen
-            var result = await repo.CreateAsync(entity);
+            var productEntity = _productFactory.PopulateProduct(body);
+            productEntity = _productFactory.PopulateProduct(productEntity);
 
-            // Kollar om produkten skapades korrekt och returnerar resultatet
-            if (result.StatusCode == StatusCode.OK)
+            if (productEntity.GetType() == typeof(ProductEntity))
             {
-                return ResponseFactory.Ok((ProductEntity)result.ContentResult!);
+                var result = await repo.CreateAsync(productEntity);
+
+                // Kollar om produkten skapades korrekt och returnerar resultatet
+                if (result.StatusCode == StatusCode.OK)
+                {
+                    return ResponseFactory.Ok((ProductEntity)result.ContentResult!);
+                }
             }
-
             // Returnerar ett fel om något gick fel vid skapandet
             return ResponseFactory.Error();
         }

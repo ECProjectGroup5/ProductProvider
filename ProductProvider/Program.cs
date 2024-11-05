@@ -1,4 +1,6 @@
 using Infrastructure.Data;
+using Infrastructure.Factories;
+using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Infrastructure.Services;
 using Microsoft.Azure.Functions.Worker;
@@ -24,7 +26,9 @@ var host = new HostBuilder()
         services.AddDbContext<DataContext>(x => x.UseSqlServer(connectionString));
         services.AddScoped<ProductService>();
         services.AddScoped<Repo>();
-        
+        services.AddScoped<ProductFactory>();
+        services.AddScoped<IRepo, Repo>();
+
 
     })
     .Build();
