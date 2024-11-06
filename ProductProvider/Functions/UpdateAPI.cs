@@ -15,7 +15,7 @@ public class UpdateAPI(ILogger<UpdateAPI> logger, ProductService productService)
     private readonly ProductService _productService = productService;
 
     [Function("UpdateAPI")]
-    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "put")] HttpRequest req)
+    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "put")] HttpRequest req)
     {
         try
         {
@@ -23,11 +23,22 @@ public class UpdateAPI(ILogger<UpdateAPI> logger, ProductService productService)
 
             if (body != null)
             {
-                var productModel = JsonConvert.DeserializeObject<ProductEntity>(body);
+                var productModel = JsonConvert.DeserializeObject<UpdateProductModel>(body);
 
                 if (productModel != null)
                 {
-                    var product = await _productService.UpdateAsync(productModel.ArticleNumber, productModel);
+                    var productEntity = new ProductEntity
+                    {
+                        ArticleNumber = productModel.ArticleNumber,
+                        Price = productModel.Price,
+                        Title = productModel.Title,
+                        DiscountPrice = productModel.DiscountPrice,
+                        Manufacturer = productModel.Manufacturer,
+                        Ingress = productModel.Ingress,
+                        Description = productModel.Description,
+                        PrimaryImage = productModel.PrimaryImage
+                    };
+                    var product = await _productService.UpdateAsync(productEntity.ArticleNumber, productEntity);
 
                     if (product.StatusCode == StatusCode.OK)
                     {

@@ -149,14 +149,4 @@ public class ProductService(IRepo repo, ILogger<ProductService> logger , Product
             return ResponseFactory.Error();
         }
     }
-
-    public async Task UpdateAsync(GetProductModel? product)
-    {
-        throw new NotImplementedException();
-    }
-
-    public async Task DeleteAsync(Guid? articlenumber)
-    {
-        throw new NotImplementedException();
-    }
 }
