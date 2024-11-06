@@ -7,44 +7,43 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace ProductProvider.Functions
+namespace ProductProvider.Functions;
+
+public class UpdateAPI(ILogger<UpdateAPI> logger, ProductService productService)
 {
-    public class UpdateAPI(ILogger<UpdateAPI> logger, ProductService productService)
+    private readonly ILogger<UpdateAPI> _logger = logger;
+    private readonly ProductService _productService = productService;
+
+    [Function("UpdateAPI")]
+    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "put")] HttpRequest req)
     {
-        private readonly ILogger<UpdateAPI> _logger = logger;
-        private readonly ProductService _productService = productService;
-
-        [Function("UpdateAPI")]
-        public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", "put")] HttpRequest req)
+        try
         {
-            try
-            {
-                var body = await new StreamReader(req.Body).ReadToEndAsync();
+            var body = await new StreamReader(req.Body).ReadToEndAsync();
 
-                if (body != null)
+            if (body != null)
+            {
+                var productModel = JsonConvert.DeserializeObject<ProductEntity>(body);
+
+                if (productModel != null)
                 {
-                    var productModel = JsonConvert.DeserializeObject<ProductEntity>(body);
+                    var product = await _productService.UpdateAsync(productModel.ArticleNumber, productModel);
 
-                    if (productModel != null)
+                    if (product.StatusCode == StatusCode.OK)
                     {
-                        var product = await _productService.UpdateAsync(productModel.ArticleNumber, productModel);
-
-                        if (product.StatusCode == StatusCode.OK)
-                        {
-                            return new OkObjectResult(product.ContentResult);
-                        }
-                        else if (product.StatusCode == StatusCode.NOT_FOUND)
-                            return new NotFoundResult();
+                        return new OkObjectResult(product.ContentResult);
                     }
+                    else if (product.StatusCode == StatusCode.NOT_FOUND)
+                        return new NotFoundResult();
                 }
+            }
 
-                return new BadRequestResult();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred in UpdateAPI.");
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-            }
+            return new BadRequestResult();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "An error occurred in UpdateAPI.");
+            return new StatusCodeResult(StatusCodes.Status500InternalServerError);
         }
     }
 }

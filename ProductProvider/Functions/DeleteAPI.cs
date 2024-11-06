@@ -7,7 +7,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace ProductProvider;
+namespace ProductProvider.Functions;
 
 public class DeleteAPI(ILogger<DeleteAPI> logger, ProductService productService)
 {
