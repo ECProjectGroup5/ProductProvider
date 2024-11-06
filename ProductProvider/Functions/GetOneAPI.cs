@@ -7,9 +7,9 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace ProductProvider;
+namespace ProductProvider.Functions;
 
-public class GetOneAPI(ILogger<GetOneAPI> logger , ProductService productService)
+public class GetOneAPI(ILogger<GetOneAPI> logger, ProductService productService)
 {
     private readonly ILogger<GetOneAPI> _logger = logger;
     private readonly ProductService _productService = productService;
@@ -17,13 +17,13 @@ public class GetOneAPI(ILogger<GetOneAPI> logger , ProductService productService
 
     [HttpGet]
     [Function("GetOneAPI")]
-    public async Task <IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
+    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get")] HttpRequest req)
     {
         try
         {
             var body = await new StreamReader(req.Body).ReadToEndAsync();
-            
-            if(body != null)
+
+            if (body != null)
             {
                 var product = JsonConvert.DeserializeObject<GetProductModel>(body);
                 var articlenumber = product!.Articlenumber;
@@ -42,7 +42,5 @@ public class GetOneAPI(ILogger<GetOneAPI> logger , ProductService productService
             _logger.LogDebug($"Error: ProductProvider.GetOneAPI.RunAsync {ex.Message}");
             return new BadRequestResult(); ;
         }
-       
-        
     }
 }

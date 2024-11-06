@@ -9,7 +9,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace ProductProvider
+namespace ProductProvider.Functions
 {
     public class CreateAPI(ILogger<CreateAPI> logger, ProductService productService)
     {
@@ -30,21 +30,19 @@ namespace ProductProvider
 
                     if (result.StatusCode == StatusCode.OK)
                     {
-                        
+
                         return new OkObjectResult((ProductEntity)result.ContentResult!);
 
                     }
-
-                    
                 }
+
                 return new BadRequestResult();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 _logger.LogDebug($"Error: ProductProvider.CreateAPI.RunAsync {ex.Message}");
                 return new BadRequestResult(); ;
             }
-
         }
     }
 }
